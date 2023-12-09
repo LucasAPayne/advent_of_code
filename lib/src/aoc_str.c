@@ -55,8 +55,39 @@ char* str_str_rev(char* str, char* sub)
     return result;
 }
 
+b32 str_eq(char* a, char* b)
+{
+    ASSERT(a);
+    ASSERT(b);
+    if (!a || !b)
+        return false;
+
+    i64 a_len = str_len(a);
+    i64 b_len = str_len(b);
+    if (a_len != b_len)
+        return false;
+
+    b32 result = true;
+    for (i64 i = 0; i < a_len; ++i)
+    {
+        if (a[i] != b[i])
+        {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
 b32 char_is_digit(char c)
 {
     b32 result = ((c >= '0') && (c <= '9'));
+    return result;
+}
+
+b32 char_is_alpha(char c)
+{
+    b32 result = ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
     return result;
 }

@@ -3,24 +3,6 @@
 
 #include <stdio.h>
 
-// NOTE(lucas): Read until EOL or EOF, return null-terminated string
-char* get_line(char* at, Arena* arena)
-{
-    char* start = at;
-    while (*at && *at != '\n' && *at != '\r')
-        ++at;
-    
-    i64 len = at - start;
-
-    char* result = push_array(arena, len+1, char);
-    for (usize i = 0; i < len; ++i)
-        result[i] = start[i];
-    
-    result[-1] = 0;
-    result[len] = '\0';
-    return result;
-}
-
 u32 get_digit(char* line, b32 search_from_start)
 {
     u32 result = 0;
@@ -140,7 +122,7 @@ void solve_part_two(char* contents, Arena* arena)
     printf("Sum: %d\n", sum);
 }
 
-int main()
+int main(void)
 {
     /* NOTE(lucas):
      * PART 1:
@@ -161,6 +143,9 @@ int main()
      * take a similar approach to part 1 and search for each string starting from the beginning and end of the line.
      * Then, continue as normal, converting the strings to a two-digit number and keeping a running total.
      */ 
+    
+    // NOTE(lucas): Part 1 answer: 54968
+    // NOTE(lucas): Part 2 answer: 54094
 
     Arena arena = arena_alloc(KILOBYTES(64));
     char* contents = read_file_into_memory("input.txt", &arena);

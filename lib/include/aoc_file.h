@@ -5,3 +5,4 @@
 
 // NOTE(lucas): Read an entire file into memory and add a null terminator at the end
 char* read_file_into_memory(char* file_name, Arena* arena);
+char* get_line(char* at, Arena* arena);

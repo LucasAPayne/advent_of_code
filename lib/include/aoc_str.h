@@ -9,4 +9,7 @@ i64 str_len(char* s);
 char* str_str(char* str, char* sub);
 char* str_str_rev(char* str, char* sub);
 
+b32 str_eq(char* a, char* b);
+
 b32 char_is_digit(char c);
+b32 char_is_alpha(char c);
