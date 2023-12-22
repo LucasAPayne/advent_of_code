@@ -4,5 +4,5 @@ set year=%1
 set day=%2
 
 cd src/%year%/%day%
-start ../../../build/aoc_%year%_%day%.exe
+start ../../../build/%year%/%day%/aoc_%year%_%day%.exe
 cd ../../..

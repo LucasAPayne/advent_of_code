@@ -65,13 +65,12 @@ u32 parse_num(char* num)
     while(*at && char_is_digit(*at))
         ++at;
 
-    i64 digits = (i64)(at - num);
-    for (i64 i = 0; i < digits; ++i)
+    u32 digits = (u32)(at - num);
+    for (u32 i = 0; i < digits; ++i)
         result += pow_u32(10, digits-1-i) * (u32)(num[i] - '0');
 
     return result;
 }
-
 
 // NOTE(lucas): Get the next word in a string and return a null-terminated copy,
 // or return 0 if no word found
@@ -157,9 +156,6 @@ void solve_part_two(char* input, Arena* arena)
     Tokenizer tokenizer = {0};
     tokenizer.at = input;
 
-    u32 max_red = 0;
-    u32 max_green = 0;
-    u32 max_blue = 0;
     u32 sum = 0;
 
     while (*tokenizer.at)

@@ -29,6 +29,7 @@ char* read_file_into_memory(char* file_name, Arena* arena)
 char* get_line(char* at, Arena* arena)
 {
     char* start = at;
+
     while (*at && *at != '\n' && *at != '\r')
         ++at;
     

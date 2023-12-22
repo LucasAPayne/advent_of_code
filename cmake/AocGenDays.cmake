@@ -3,18 +3,30 @@ function (AOC_GENERATE YEAR DAY)
     target_include_directories(aoc_${YEAR}_${DAY} PRIVATE ${CMAKE_SOURCE_DIR}/lib/include)
     target_link_libraries(aoc_${YEAR}_${DAY} aoc)
 
+    # NOTE(lucas): Since the input.txt files are stored in the same folder as the
+    # source for each day, the working directory also needs to be in the same folder.
+    # NOTE(lucas): Place the VS solution for each day of the year into a solution folder
+    # (only affects organization in Visual Studio).
     set_target_properties(aoc_${YEAR}_${DAY} PROPERTIES 
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}
-    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${DAY})
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/${YEAR}/${DAY}
+    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${DAY}
+    FOLDER ${YEAR})
 
-    add_custom_target(run_${YEAR}_${DAY}
-        COMMAND aoc_${YEAR}_${DAY}
-        DEPENDS aoc_${YEAR}_${DAY}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    add_custom_target(test_${YEAR}_${DAY}
-        COMMAND aoc_${YEAR}_${DAY} --test
-        DEPENDS aoc_${YEAR}_${DAY}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    if (MSVC)
+        # /W4 enables the highest level of warnings, and /WX turns warnings into errors
+        # /Oi Replace functions with intrinsics where possible to improve performance
+        # /wd removes specified warnings.
+        # C4101 and C4189 are about unused parameters/variables and are usually not particularly useful.
+        target_compile_options(aoc_${YEAR}_${DAY} PRIVATE
+                               /Oi /WX /W4
+                               /wd4101 /wd4189 /D_CRT_SECURE_NO_WARNINGS)
+
+        if (CMAKE_BUILD_TYPE STREQUAL Debug)
+            # In debug mode, enable complete debug information (/Zi) and disable optimization (/Od)
+            # /RTCcsu enables run-time error checking
+            target_compile_options(aoc_${YEAR}_${DAY} PRIVATE /Zi /Od /RTCcsu)
+        endif()
+    endif()
 endfunction()
 
 function(AOC_GENERATE_YEAR AOC_YEAR)
@@ -29,6 +41,4 @@ function(AOC_GENERATE_YEAR AOC_YEAR)
             message("Skipping ${DIR}")
         endif()
     endforeach()
-
-    add_custom_target(run_${AOC_YEAR} ${custom_target_args} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()

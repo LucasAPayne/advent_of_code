@@ -5,7 +5,9 @@ i64 str_len(char* s)
     // NOTE(lucas): To get length of a string, get another pointer,
     // then advance until the null terminator and get the difference
     // between the copy and original pointer location
-    ASSERT(s);
+    // ASSERT(s);
+    if (!s)
+        return 0;
     char* copy = s;
     for (copy; *copy; ++copy)
         ;
@@ -77,6 +79,17 @@ b32 str_eq(char* a, char* b)
         }
     }
 
+    return result;
+}
+
+char* str_copy(char* src, Arena* arena)
+{
+    usize len = str_len(src);
+    char* result = push_array(arena, len+1, char);
+    for (i64 i = 0; i < len; ++i)
+        result[i] = src[i];
+
+    result[len] = '\0';
     return result;
 }
 
