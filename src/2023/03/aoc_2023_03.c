@@ -1,58 +1,7 @@
 #include "aoc_file.h"
-#include "aoc_str.h"
+#include "aoc_parser.h"
 
 #include <stdio.h>
-
-typedef struct Tokenizer
-{
-    char* at;
-} Tokenizer;
-
-typedef struct s8
-{
-    char* str;
-    i64 len;
-} s8;
-
-typedef struct S8FindResult
-{
-    s8 str;
-    i64 index; // NOTE(lucas): index into the larger string containing this one
-} S8FindResult;
-
-// NOTE(lucas): Look through a string until a number is found.
-// Return a copy of the number string.
-S8FindResult get_num(char* str, Arena* arena)
-{
-    ASSERT(str);
-    S8FindResult result = {0};
-    result.index = -1;
-
-    char* at = str;
-
-    if (!at)
-        return result;
-
-    while (*at && !char_is_digit(*at))
-        ++at;
-    
-    if (!*at)
-        return result;
-
-    char* num_start = at;
-    while(*at && char_is_digit(*at))
-        ++at;
-
-    result.str.len = at - num_start;
-    result.str.str = push_array(arena, result.str.len+1, char);
-    for (i64 i = 0; i < result.str.len; ++i)
-        result.str.str[i] = num_start[i];
-
-    result.str.str[result.str.len] = '\0';
-    result.index = num_start - str;
-
-    return result;
-}
 
 i64 get_asterisk_index(char* str)
 {
@@ -72,31 +21,6 @@ i64 get_asterisk_index(char* str)
 
     result = at - str;
     ++at;
-    return result;
-}
-
-u32 pow_u32(u32 num, u32 pow)
-{
-    u32 result = 1;
-
-    for (u32 i = 0; i < pow; ++i)
-        result *= num;
-
-    return result;
-}
-
-u32 parse_num(char* num)
-{
-    u32 result = 0;
-    char* at = num;
-
-    while(*at && char_is_digit(*at))
-        ++at;
-
-    u32 digits = (u32)(at - num);
-    for (u32 i = 0; i < digits; ++i)
-        result += pow_u32(10, digits-1-i) * (u32)(num[i] - '0');
-
     return result;
 }
 
@@ -130,7 +54,7 @@ void solve_part_one(char* input, Arena* arena)
         while(*curr_line)
         {
             // TODO(lucas): Can this work with the tokenizer and not be inconvenient?
-            S8FindResult num_str = get_num(curr_line, arena);
+            S8FindResult num_str = find_num_index(curr_line, arena);
             if (num_str.index == -1)
                 *curr_line = 0;
             else
@@ -241,7 +165,7 @@ void solve_part_two(char* input, Arena* arena)
                         i64 new_index = index;
                         while(*curr_line && char_is_digit(*(curr_line + new_index-1)))
                             --new_index;
-                        num_str[neighbors] = get_num(curr_line + new_index, arena);
+                        num_str[neighbors] = find_num_index(curr_line + new_index, arena);
                         num[neighbors] = parse_num(num_str[neighbors].str.str);
                     }
                     ++neighbors;
@@ -250,7 +174,7 @@ void solve_part_two(char* input, Arena* arena)
                 {
                     if (neighbors < 2)
                     {
-                        num_str[neighbors] = get_num(curr_line + index + 1, arena);
+                        num_str[neighbors] = find_num_index(curr_line + index + 1, arena);
                         num[neighbors] = parse_num(num_str[neighbors].str.str);
                     }
                     ++neighbors;
@@ -274,7 +198,7 @@ void solve_part_two(char* input, Arena* arena)
                                     --prev_line_it;
                                     ++correction;
                                 }
-                                num_str[neighbors] = get_num(prev_line_it, arena);
+                                num_str[neighbors] = find_num_index(prev_line_it, arena);
                                 num[neighbors] = parse_num(num_str[neighbors].str.str);
                                 found = true;
                                 prev_line_it += correction;
@@ -304,7 +228,7 @@ void solve_part_two(char* input, Arena* arena)
                                     --next_line_it;
                                     ++correction;
                                 }
-                                num_str[neighbors] = get_num(next_line_it, arena);
+                                num_str[neighbors] = find_num_index(next_line_it, arena);
                                 num[neighbors] = parse_num(num_str[neighbors].str.str);
                                 found = true;
                                 next_line_it += correction;
@@ -361,9 +285,8 @@ int main(void)
     // NOTE(lucas): Part 1 answer: 520135
     // NOTE(lucas): Part 2 answer: 72514855
 
-    // TODO(lucas): These methods became increasingly complex as more edge cases were introduced, especiall in part 2.
-    // This day could use some compression. See if anything common can be pulled out, or if anything
-    // can be simplified.
+    // TODO(lucas): These methods became increasingly complex as more edge cases were introduced, especially in part 2.
+    // This day could use some compression. See if anything common can be pulled out, or if anything can be simplified.
     Arena arena = arena_alloc(KILOBYTES(128));
     char* contents = read_file_into_memory("input.txt", &arena);
     solve_part_one(contents, &arena);

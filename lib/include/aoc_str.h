@@ -3,6 +3,12 @@
 #include "aoc_memory.h"
 #include "aoc_types.h"
 
+typedef struct s8
+{
+    char* str;
+    i64 len;
+} s8;
+
 // IMPORTANT(lucas): Strings are assumed to be null-terminated in these functions
 // TODO(lucas): Optimize string methods
 // TODO(lucas): Check for null strings as well as asserting

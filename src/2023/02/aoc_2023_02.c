@@ -1,76 +1,7 @@
 #include "aoc_file.h"
-#include "aoc_str.h"
+#include "aoc_parser.h"
 
 #include <stdio.h>
-
-typedef struct Tokenizer
-{
-    char* at;
-} Tokenizer;
-
-typedef struct s8
-{
-    char* str;
-    i64 len;
-} s8;
-
-// NOTE(lucas): Look through a string until a number is found.
-// Return a copy of the number string.
-s8 get_num(Tokenizer* tokenizer, Arena* arena)
-{
-    ASSERT(tokenizer->at);
-    s8 result = {0};
-
-    if (!tokenizer->at)
-        return result;
-
-    while (*tokenizer->at && !char_is_digit(*tokenizer->at))
-        ++tokenizer->at;
-    
-    if (!*tokenizer->at)
-        return result;
-
-    char* start = tokenizer->at;
-    while(*tokenizer->at && char_is_digit(*tokenizer->at))
-        ++tokenizer->at;
-
-    if (!*tokenizer->at)
-        return result;
-
-    result.len = tokenizer->at - start;
-    result.str = push_array(arena, result.len+1, char);
-    for (i64 i = 0; i < result.len; ++i)
-        result.str[i] = start[i];
-
-    result.str[result.len] = '\0';
-
-    return result;
-}
-
-u32 pow_u32(u32 num, u32 pow)
-{
-    u32 result = 1;
-
-    for (u32 i = 0; i < pow; ++i)
-        result *= num;
-
-    return result;
-}
-
-u32 parse_num(char* num)
-{
-    u32 result = 0;
-    char* at = num;
-
-    while(*at && char_is_digit(*at))
-        ++at;
-
-    u32 digits = (u32)(at - num);
-    for (u32 i = 0; i < digits; ++i)
-        result += pow_u32(10, digits-1-i) * (u32)(num[i] - '0');
-
-    return result;
-}
 
 // NOTE(lucas): Get the next word in a string and return a null-terminated copy,
 // or return 0 if no word found
@@ -120,16 +51,14 @@ void solve_part_one(char* input, Arena* arena)
         char* line = get_line(tokenizer.at, arena);
         usize line_len = str_len(line);
 
-        s8 game_id_str = get_num(&tokenizer, arena);
-        u32 game_id = parse_num(game_id_str.str);
+        u32 game_id = get_num(&tokenizer, arena);
 
         b32 valid = true;
         while (*tokenizer.at != '\n')
         {
-            s8 num_str = get_num(&tokenizer, arena);
+            u32 num = get_num(&tokenizer, arena);
             if (tokenizer.at)
             {
-                u32 num = parse_num(num_str.str);
                 s8 word = get_word(&tokenizer, arena);
                 if ((str_eq(word.str, "red")   && num > max_red) ||
                     (str_eq(word.str, "green") && num > max_green) ||
@@ -163,8 +92,7 @@ void solve_part_two(char* input, Arena* arena)
         char* line = get_line(tokenizer.at, arena);
         usize line_len = str_len(line);
 
-        s8 game_id_str = get_num(&tokenizer, arena);
-        u32 game_id = parse_num(game_id_str.str);
+        u32 game_id = get_num(&tokenizer, arena);
 
         u32 max_red = 0;
         u32 max_green = 0;
@@ -172,10 +100,9 @@ void solve_part_two(char* input, Arena* arena)
 
         while (*tokenizer.at != '\n')
         {
-            s8 num_str = get_num(&tokenizer, arena);
+            u32 num = get_num(&tokenizer, arena);
             if (tokenizer.at)
             {
-                u32 num = parse_num(num_str.str);
                 s8 word = get_word(&tokenizer, arena);
                 if (str_eq(word.str, "red") && num > max_red)
                     max_red = num;
